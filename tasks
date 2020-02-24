@@ -14,7 +14,7 @@ case "${command}" in
       ;;
   apply)
       terraform init
-	    terraform apply
+      terraform apply
       ;;
 esac
 
