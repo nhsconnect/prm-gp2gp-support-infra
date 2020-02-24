@@ -1,0 +1,21 @@
+#!/bin/bash
+
+set -ex
+
+command="$1"
+bucket_name="prm-gp2gp-terraform-bootstrap-state"
+
+case "${command}" in
+  push)
+      aws s3 cp terraform.tfstate s3://${bucket_name}/terraform.tfstate
+      ;;
+  pull)
+      aws s3 cp s3://${bucket_name}/terraform.tfstate terraform.tfstate
+      ;;
+  apply)
+      terraform init
+	    terraform apply
+      ;;
+esac
+
+set +ex
