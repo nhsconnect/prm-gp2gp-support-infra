@@ -11,6 +11,8 @@ function setup_account_variables {
       export bucket_name="prm-gp2gp-terraform-bootstrap-state"
     elif [ "${NHS_ACCOUNT}" == "dev" ]; then
       export bucket_name="prm-gp2gp-terraform-bootstrap-state-dev"
+    elif [ "${NHS_ACCOUNT}" == "preprod" ]; then
+      export bucket_name="prm-gp2gp-terraform-bootstrap-state-preprod"
     else
       echo "NHS_ACCOUNT=$NHS_ACCOUNT is not supported"
       exit 2
