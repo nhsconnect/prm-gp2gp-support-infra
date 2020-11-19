@@ -9,6 +9,11 @@ function setup_account_variables {
     fi
     if [ "${NHS_ACCOUNT}" == "common" ]; then
       export bucket_name="prm-gp2gp-terraform-bootstrap-state"
+    elif [ "${NHS_ACCOUNT}" == "dev" ]; then
+      export bucket_name="prm-gp2gp-terraform-bootstrap-state-dev"
+    else
+      echo "NHS_ACCOUNT=$NHS_ACCOUNT is not supported"
+      exit 2
     fi
     export TF_VAR_FILE="${NHS_ACCOUNT}.tfvars"
 }
@@ -18,21 +23,23 @@ command="$1"
 case "${command}" in
   push)
       setup_account_variables
-      aws s3 cp terraform.tfstate s3://${bucket_name}/terraform.tfstate
+      aws s3 cp "${NHS_ACCOUNT}.tfstate" s3://${bucket_name}/terraform.tfstate
       ;;
   pull)
       setup_account_variables
-      aws s3 cp s3://${bucket_name}/terraform.tfstate terraform.tfstate
+      aws s3 cp s3://${bucket_name}/terraform.tfstate "${NHS_ACCOUNT}.tfstate"
       ;;
   plan)
       setup_account_variables
-      terraform init 
-      terraform plan -var-file="$TF_VAR_FILE"
+      rm -rf .terraform
+      terraform init -reconfigure
+      terraform plan -var-file="$TF_VAR_FILE" -state="${NHS_ACCOUNT}.tfstate"
       ;;
   apply)
       setup_account_variables
-      terraform init
-      terraform apply -var-file="$TF_VAR_FILE"
+      rm -rf .terraform
+      terraform init -reconfigure
+      terraform apply -var-file="$TF_VAR_FILE" -state="${NHS_ACCOUNT}.tfstate"
       ;;
 esac
 
