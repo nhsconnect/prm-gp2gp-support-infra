@@ -1,6 +1,6 @@
 # S3 bucket to hold terraform states of other repos
 resource "aws_s3_bucket" "terraform_state" {
-  bucket = "prm-gp2gp-terraform-state"
+  bucket = var.s3_bucket_name
   acl    = "private"
 
   # To allow rolling back states
@@ -24,7 +24,7 @@ resource "aws_s3_bucket" "terraform_state" {
 
 # S3 bucket to hold terraform state produced in this repo
 resource "aws_s3_bucket" "terraform_bootstrap_state" {
-  bucket = "prm-gp2gp-terraform-bootstrap-state"
+  bucket = var.s3_bootstrap_bucket_name
   acl    = "private"
 
   # To allow rolling back states

@@ -1,20 +1,38 @@
 #!/bin/bash
 
-set -ex
+set -e
+
+function setup_account_variables {
+    if [ -z "${NHS_ACCOUNT}" ]; then
+      echo "NHS_ACCOUNT environment variable is not set."
+      exit 3
+    fi
+    if [ "${NHS_ACCOUNT}" == "common" ]; then
+      export bucket_name="prm-gp2gp-terraform-bootstrap-state"
+    fi
+    export TF_VAR_FILE="${NHS_ACCOUNT}.tfvars"
+}
 
 command="$1"
-bucket_name="prm-gp2gp-terraform-bootstrap-state"
 
 case "${command}" in
   push)
+      setup_account_variables
       aws s3 cp terraform.tfstate s3://${bucket_name}/terraform.tfstate
       ;;
   pull)
+      setup_account_variables
       aws s3 cp s3://${bucket_name}/terraform.tfstate terraform.tfstate
       ;;
+  plan)
+      setup_account_variables
+      terraform init 
+      terraform plan -var-file="$TF_VAR_FILE"
+      ;;
   apply)
+      setup_account_variables
       terraform init
-      terraform apply
+      terraform apply -var-file="$TF_VAR_FILE"
       ;;
 esac
 
