@@ -4,34 +4,47 @@ This is the minimal, very first setup of terraform backend in S3 and DynamoDB.
 
 The terraform state produced in this repository is pushed to a separate bucket with AWS CLI.
 
+## Setup
+
+These instructions assume you are using:
+
+- [aws-vault](https://github.com/99designs/aws-vault) to validate your AWS credentials.
+- [dojo](https://github.com/kudulab/dojo) to provide an execution environment
+
 ## Bootstrapping Terraform
 
-Export your AWS credentials in shell (if you have credentials in `~/.aws/credentials` that will work too):
+1. Enter the container:
+
+`aws-vault exec <profile-name> -- dojo`
+
+2. Invoke terraform locally:
+
+- for common account
 
 ```
-export AWS_ACCESS_KEY_ID=***********
-export AWS_SECRET_ACCESS_KEY=**************************
-unset AWS_SESSION_TOKEN
+  NHS_ACCOUNT=common ./tasks pull
+  NHS_ACCOUNT=common ./tasks plan
+  NHS_ACCOUNT=common ./tasks apply
 ```
 
-Enter docker container with terraform and AWS CLI by typing:
+- for dev account
 
 ```
-dojo
+  NHS_ACCOUNT=dev ./tasks pull
+  NHS_ACCOUNT=dev ./tasks plan
+  NHS_ACCOUNT=dev ./tasks apply
 ```
 
-at the root of this repository.
-
-Assume role with elevated permissions:
+- for preprod account
 
 ```
-eval $(aws-cli-assumerole -rmfa <role-arn> <mfa-otp-code>)
+  NHS_ACCOUNT=preprod ./tasks pull
+  NHS_ACCOUNT=preprod ./tasks plan
+  NHS_ACCOUNT=preprod ./tasks apply
 ```
 
-## Working with common account
+3. Push any state changes:
 
-```bash
-NHS_ACCOUNT=common ./tasks pull
-NHS_ACCOUNT=common ./tasks plan
-NHS_ACCOUNT=common ./tasks apply
+```
+  NHS_ACCOUNT=<account_name> ./tasks push
 ```
